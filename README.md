@@ -1,3 +1,4 @@
+[![Gem Version](https://badge.fury.io/rb/pronto-blacklist.svg)](https://badge.fury.io/rb/pronto-blacklist)
 [![CircleCI](https://circleci.com/gh/pbstriker38/pronto-blacklist.svg?style=svg)](https://circleci.com/gh/pbstriker38/pronto-blacklist)
 
 # Pronto::Blacklist
