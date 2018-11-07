@@ -1,34 +1,112 @@
 version: 2
+references:
+  cache_repo: &cache_repo
+    save_cache:
+      key: v1-repo-{{ .Branch }}-{{ .Revision }}
+      paths:
+        - .
+
+  restore_repo: &restore_repo
+    restore_cache:
+      key: v1-repo-{{ .Branch }}-{{ .Revision }}
+
+  bundle: &bundle
+    run:
+      name: Bundle Install
+      command: bundle check || bundle install --jobs=4 --retry=3 --path vendor/bundle
+
+  run_tests: &run_tests
+    run:
+      name: run tests
+      command: bundle exec rake spec
+
 jobs:
   build:
     docker:
-       - image: circleci/ruby:2.4.1
-
+      - image: circleci/ruby:2.2
     working_directory: ~/pronto-blacklist
-
     steps:
-      - run: sudo apt-get update -qq && sudo apt-get install -y cmake
       - checkout
-
-      # Download and cache dependencies
+      - *cache_repo
+  ruby_2.2:
+    docker:
+      - image: circleci/ruby:2.2
+    working_directory: ~/pronto-blacklist
+    steps:
+      - *restore_repo
+      - run: sudo apt-get update -qq && sudo apt-get install -y cmake
       - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
-      - run:
-          name: install dependencies
-          command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
-
+          key: v1-dependencies-2.2-{{ checksum "pronto-blacklist.gemspec" }}
+      - run: sudo apt-get update -qq && sudo apt-get install -y cmake
+      - *bundle
       - save_cache:
+          key: v1-dependencies-2.2-{{ checksum "pronto-blacklist.gemspec" }}
           paths:
             - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+      - *run_tests
+  ruby_2.3:
+    docker:
+      - image: circleci/ruby:2.3
+    working_directory: ~/pronto-blacklist
+    steps:
+      - *restore_repo
+      - run: sudo apt-get update -qq && sudo apt-get install -y cmake libssl-dev
+      - restore_cache:
+          key: v1-dependencies-2.3-{{ checksum "pronto-blacklist.gemspec" }}
+      - run: sudo apt-get update -qq && sudo apt-get install -y cmake
+      - *bundle
+      - save_cache:
+          key: v1-dependencies-2.3-{{ checksum "pronto-blacklist.gemspec" }}
+          paths:
+            - ./vendor/bundle
+      - *run_tests
+  ruby_2.4:
+    docker:
+      - image: circleci/ruby:2.4
+    working_directory: ~/pronto-blacklist
+    steps:
+      - *restore_repo
+      - run: sudo apt-get update -qq && sudo apt-get install -y cmake
+      - restore_cache:
+          key: v1-dependencies-2.4-{{ checksum "pronto-blacklist.gemspec" }}
+      - run: sudo apt-get update -qq && sudo apt-get install -y cmake
+      - *bundle
+      - save_cache:
+          key: v1-dependencies-2.4-{{ checksum "pronto-blacklist.gemspec" }}
+          paths:
+            - ./vendor/bundle
+      - *run_tests
+  ruby_2.5:
+    docker:
+      - image: circleci/ruby:2.5
+    working_directory: ~/pronto-blacklist
+    steps:
+      - *restore_repo
+      - run: sudo apt-get update -qq && sudo apt-get install -y cmake
+      - restore_cache:
+          key: v1-dependencies-2.5-{{ checksum "pronto-blacklist.gemspec" }}
+      - run: sudo apt-get update -qq && sudo apt-get install -y cmake
+      - *bundle
+      - save_cache:
+          key: v1-dependencies-2.5-{{ checksum "pronto-blacklist.gemspec" }}
+          paths:
+            - ./vendor/bundle
+      - *run_tests
 
-      # run tests!
-      - run:
-          name: run tests
-          command: |
-            bundle exec rspec --format documentation
+workflows:
+  version: 2
+  test_supported_ruby_versions:
+    jobs:
+      - build
+      - ruby_2.2:
+          requires:
+            - build
+      - ruby_2.3:
+          requires:
+            - build
+      - ruby_2.4:
+          requires:
+            - build
+      - ruby_2.5:
+          requires:
+            - build

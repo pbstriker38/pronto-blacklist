@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'pronto-blacklist'
   spec.version       = Pronto::BlacklistVersion::VERSION
   spec.authors       = ['Daniel Alfaro']
-  spec.email         = ['daniel@fair.com']
+  spec.email         = ['pbstriker38@gmail.com']
 
   spec.summary       = %q{Detects additions of items on blacklist.}
   spec.description   = %q{Detects additions of items on blacklist.}
@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'pronto', '~> 0.9'
 
-  spec.add_development_dependency 'bundler', '~> 1.17'
+  spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
 end
