@@ -5,6 +5,8 @@
 
 Pronto runner to flag strings from a blacklist. [What is Pronto?](https://github.com/prontolabs/pronto)
 
+This is useful for preventing use of deprecated classes.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -28,8 +30,8 @@ Create the following yaml file in the root of your codebase
 `.pronto-blacklist.yml`
 ```yaml
 blacklist
-  - word
-  - another
+  - DeprecatedClass
+  - cancelled
 ```
 
 ## Development
