@@ -29,10 +29,23 @@ Create the following yaml file in the root of your codebase
 
 `.pronto-blacklist.yml`
 ```yaml
-blacklist
+blacklist:
   - DeprecatedClass
   - cancelled
+  - some other string
+options:
+  DeprecatedClass:
+    exclude:
+      - '**/*_spec.rb'
+  cancelled:
+    case_sensitive: false
 ```
+
+### Options
+
+`exclude`: Accepts an array of paths in .gitignore format. It will not blacklist the string in matching files.
+
+`case_sensitive`: Defaults to `true` if not set.
 
 ## Development
 
