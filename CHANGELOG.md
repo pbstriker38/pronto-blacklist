@@ -16,4 +16,4 @@
 
 ### Added
 
-* [#3](https://github.com/pbstriker38/pronto-blacklist/pull/1): First release
+* [#1](https://github.com/pbstriker38/pronto-blacklist/pull/1): First release
