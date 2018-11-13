@@ -1,5 +1,6 @@
 require 'pronto/blacklist/version'
 require 'pronto'
+require 'pathspec'
 
 module Pronto
   class Blacklist < Runner
@@ -15,11 +16,28 @@ module Pronto
     private
 
     def inspect(patch)
+      return if patch.delta.new_file[:path] == '.pronto-blacklist.yml'
+
       patch.added_lines.map do |line|
-        blacklist_words.map do |blacklist_word|
-          new_message(line, blacklist_word) if line.content.include?(blacklist_word)
+        blacklist_strings.map do |blacklist_string|
+          new_message(line, blacklist_string) if match?(line, blacklist_string)
         end
       end
+    end
+
+    def match?(line, blacklist_string)
+      options = options_for(blacklist_string)
+
+      if options['exclude'] && options['exclude'].any?
+        return false if PathSpec.new(options['exclude']).match(line.patch.new_file_full_path)
+      end
+
+
+      if options['case_sensitive'] == false
+        return line.content.downcase.include?(blacklist_string.downcase)
+      end
+
+      line.content.include?(blacklist_string)
     end
 
     def new_message(line, word)
@@ -28,18 +46,23 @@ module Pronto
       Message.new(path, line, :error, "Do not use #{word}", nil, self.class)
     end
 
-    def blacklist_words
-      @blacklist_words ||= begin
-        if File.exist?(config_path)
-          YAML.load_file(config_path)['blacklist'] || []
-        else
-          []
-        end
-      end
+    def blacklist_strings
+      @blacklist_strings ||= config_hash['blacklist'] || []
     end
 
-    def config_path
-      File.expand_path(File.join('./', '.pronto-blacklist.yml'))
+    def options_for(blacklist_string)
+      config_hash['options'][blacklist_string] || {}
+    end
+
+    def config_hash
+      @config_hash ||= begin
+        config_path = File.expand_path(File.join('./', '.pronto-blacklist.yml'))
+        if File.exist?(config_path)
+          YAML.load_file(config_path)
+        else
+          {}
+        end
+      end
     end
   end
 end
