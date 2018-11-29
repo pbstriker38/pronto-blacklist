@@ -39,6 +39,7 @@ options:
       - '**/*_spec.rb'
   cancelled:
     case_sensitive: false
+    ignore_comments: false
 ```
 
 ### Options
@@ -46,6 +47,8 @@ options:
 `exclude`: Accepts an array of paths in .gitignore format. It will not blacklist the string in matching files.
 
 `case_sensitive`: Defaults to `true` if not set.
+
+`ignore_comments`: Defaults to `true` if not set.
 
 ## Development
 

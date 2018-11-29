@@ -32,12 +32,19 @@ module Pronto
         return false if PathSpec.new(options['exclude']).match(line.patch.new_file_full_path)
       end
 
-
-      if options['case_sensitive'] == false
-        return line.content.downcase.include?(blacklist_string.downcase)
+      # if we should check comments for occurance of blacklisted string
+      if !evaluate_comments?(options)
+        return false if line.strip.start_with?("#")
       end
 
       line.content.include?(blacklist_string)
+    end
+
+    # should we check comments for occurances of blacklisted string?
+    def evaluate_comments?(options)
+      return false if options['ignore_comments'] == false
+      # default to true if the option isn't set
+      true
     end
 
     def new_message(line, word)
