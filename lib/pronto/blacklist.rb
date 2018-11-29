@@ -37,6 +37,10 @@ module Pronto
         return false if line.strip.start_with?("#")
       end
 
+      if options['case_sensitive'] == false
+        return line.content.downcase.include?(blacklist_string.downcase)
+      end
+
       line.content.include?(blacklist_string)
     end
 
